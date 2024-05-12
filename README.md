@@ -1,8 +1,5 @@
 # 운전선생 Frontend task
 
-<br>
-<br>
-
 ## 실행법
 
 ```
