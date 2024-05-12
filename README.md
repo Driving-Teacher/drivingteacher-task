@@ -3,8 +3,12 @@
 ## 실행법
 
 ```
-- 실행 : `pnpm dev`
-- 테스트 : `pnpm test`
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint"
+}
 ```
 
 <br>
