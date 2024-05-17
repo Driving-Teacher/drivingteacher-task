@@ -21,7 +21,11 @@ const SelectLessonPage = ({ data }: SelectLessonPageProps) => {
 
   const {
     selectedLicenseItem,
+    selectedClassItem,
+    classList,
+    hasMultipleClasses,
     handleClickLicenseTypeButton,
+    handleClickClassButton,
   } = useSelectLessonPage()
 
   return (
@@ -41,6 +45,22 @@ const SelectLessonPage = ({ data }: SelectLessonPageProps) => {
           ))}
         </div>
       </div>
+      {hasMultipleClasses && (
+        <div className={cn('flex flex-col')}>
+          <h2 className={cn('text-xl font-bold', 'mt-5')}>면허 보유 여부</h2>
+          <div className={cn('grid grid-cols-2 grid-rows-2 gap-3', 'mt-2')}>
+            {classList.map((item) => (
+              <Button
+                key={item.type}
+                buttonType='outlined'
+                label={item.type}
+                active={item.type === selectedClassItem?.type}
+                onClick={() => handleClickClassButton(item)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
