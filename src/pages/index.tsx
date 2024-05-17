@@ -4,6 +4,7 @@ import type { Lesson } from './api/get-lesson'
 import { BASE_URL } from '@/constants/api'
 import { Button } from '@/components/ui/button/Button'
 import { useSelectLessonPage } from '@/hooks/pages/useSelectLessonPage'
+import { commaizeNumber } from '@toss/utils'
 
 export interface SelectLessonPageProps {
   data: Lesson[]
@@ -22,10 +23,14 @@ const SelectLessonPage = ({ data }: SelectLessonPageProps) => {
   const {
     selectedLicenseItem,
     selectedClassItem,
+    showsNextStepUI,
     classList,
+    finalLicenseName,
+    finalPrice,
     hasMultipleClasses,
     handleClickLicenseTypeButton,
     handleClickClassButton,
+    handleClickNextButton,
   } = useSelectLessonPage()
 
   return (
@@ -60,6 +65,37 @@ const SelectLessonPage = ({ data }: SelectLessonPageProps) => {
             ))}
           </div>
         </div>
+      )}
+      {/* bottom UI */}
+      {showsNextStepUI && (
+        <section
+          className={cn(
+            'fixed bottom-0 left-0',
+            'flex justify-between',
+            'w-full h-[84px]',
+            'shadow-md',
+            'bg-white',
+            'py-2 px-3',
+            'shadow-[0_-3px_20px_#ddd]'
+          )}
+        >
+          <div className={cn('flex flex-col items-start justify-center')}>
+            <p className={cn('text-base text-[#a3a3a0]')}>
+              {finalLicenseName}
+            </p>
+            <p className={cn('font-semibold')}>
+              {commaizeNumber(finalPrice || 0)}원
+            </p>
+          </div>
+          <div className={cn('flex justify-end', 'w-1/2')}>
+            <Button
+              buttonType='filled'
+              classNames={cn('w-full max-w-[200px]', 'h-full')}
+              label="다음"
+              onClick={handleClickNextButton}
+            />
+          </div>
+        </section>
       )}
     </div>
   );
