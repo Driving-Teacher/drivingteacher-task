@@ -1,15 +1,37 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextBold } from "../components/TextBold";
+import { SelectLicenseBox } from "@/components/SelectLicenseBox";
+import { Lesson, LicenseGroup } from "@/model/selectLesson";
+import { useGoNext } from "@/hooks/use-go-next";
+import {
+  initialLicenseGroup,
+  initialLicenseSelected,
+  initialLicenseHave,
+} from "../constants";
+import {
+  addCommaToPrice,
+  convertLicenseTypeEngToKr,
+  getLicenseGroup,
+  getLicenseNameStr,
+} from "@/utils";
 
 const SelectLesson = () => {
-  const [licenseSelected, setLicenseSelected] = useState("");
-  const [licenseHave, setLicenseHave] = useState("");
+  const [licenseGroup, setLicenseGroup] =
+    useState<LicenseGroup>(initialLicenseGroup);
+  const [licenseSelected, setLicenseSelected] = useState<(string | Lesson[])[]>(
+    initialLicenseSelected
+  );
+  const [licenseHave, setLicenseHave] = useState<Lesson>(initialLicenseHave);
+
+  const goNext = useGoNext();
 
   useEffect(() => {
     // fetch lesson data from API
     (async () => {
       const Resp = await fetch("/api/get-lesson");
-      const fetchedData = await Resp.json();
+      const fetchedData: Lesson[] = await Resp.json();
+      const licenseGroupResp = getLicenseGroup(fetchedData);
+      setLicenseGroup(licenseGroupResp);
     })();
   }, []);
 
@@ -21,57 +43,62 @@ const SelectLesson = () => {
           <section className="flex flex-col gap-[15px]">
             <TextBold text="면허 종류" size="20px" />
             <div className="flex flex-wrap gap-[10px]">
-              {["1", "2", "3", "4"].map((v, idx) => {
-                let isSelected = v === licenseSelected;
+              {Object.entries(licenseGroup).map(([key, value], idx) => {
+                let isSelected = key === licenseSelected[0];
                 return (
-                  <div
-                    className={`w-[180px] border ${
-                      isSelected ? "border-yellow-500 bg-yellow-100" : ""
-                    } font-bold flex justify-center items-center h-[50px] rounded-lg hover:cursor-pointer`}
-                    key={idx}
+                  <SelectLicenseBox
+                    isSelected={isSelected}
+                    text={convertLicenseTypeEngToKr(key)}
                     onClick={() => {
-                      setLicenseSelected(v);
-                      setLicenseHave("");
+                      setLicenseSelected([key, value]);
+                      setLicenseHave(
+                        value.length === 1 ? value[0] : initialLicenseHave
+                      );
+                      console.log("selected", key, value);
                     }}
-                  >
-                    <TextBold text="2종 보통" size="15px" />
-                  </div>
+                    key={`licenseType${idx}`}
+                  />
                 );
               })}
             </div>
           </section>
-          <section className="flex flex-col gap-[15px]">
-            <TextBold text="면허 보유 여부" size="20px" />
-            <div className="flex flex-wrap gap-[10px]">
-              {["1", "2", "3"].map((v, idx) => {
-                let isSelected = v === licenseHave;
-                return (
-                  <div
-                    className={`w-[180px] border ${
-                      isSelected ? "border-yellow-500 bg-yellow-100" : ""
-                    } font-bold flex justify-center items-center h-[50px] rounded-lg hover:cursor-pointer`}
-                    key={idx}
-                    onClick={() => {
-                      setLicenseHave(v);
-                    }}
-                  >
-                    <TextBold text="2종 보통" size="15px" />
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+          {licenseSelected[1].length > 1 ? (
+            <section className="flex flex-col gap-[15px]">
+              <TextBold text="면허 보유 여부" size="20px" />
+              <div className="flex flex-wrap gap-[10px]">
+                {Object.values(licenseSelected[1]).map((v, idx) => {
+                  // console.log(v);
+                  let isSelected = v.name === licenseHave.name;
+                  return (
+                    <SelectLicenseBox
+                      isSelected={isSelected}
+                      text={getLicenseNameStr(v.name)}
+                      onClick={() => {
+                        setLicenseHave(v);
+                        console.log("licenseHave", v);
+                      }}
+                      key={`licenseHave${idx}`}
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
         </section>
         <section className="flex justify-between items-center px-[10px] shadow-[0_-5px_20px_0_rgba(0,0,0,0.3)]">
           <div className=" w-fit">
-            <div className="font-bold text-gray-500">2종 소형(신규)</div>
-            <TextBold text="XXX 원" size="15px" />
+            <div className="font-bold text-gray-500">{licenseHave.name}</div>
+            <TextBold
+              text={`${addCommaToPrice(licenseHave.price)} 원`}
+              size="15px"
+            />
           </div>
           <button
             className="bg-yellow-300 hover:bg-opacity-50 cursor-pointer w-[80px] h-[40px] disabled:bg-gray-400 disabled:text-gray-600"
-            disabled={!licenseHave.length || !licenseSelected.length}
+            disabled={!licenseHave.name.length || !licenseSelected.length}
             onClick={() => {
-              alert("click next!");
+              console.log("click next!", licenseHave);
+              goNext(licenseHave);
             }}
           >
             <TextBold text="다음" size="15px" />

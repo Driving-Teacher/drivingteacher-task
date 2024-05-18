@@ -1,11 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { Lesson } from "@/model/selectLesson";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-interface Lesson {
-  code: string;
-  price: number;
-  name: string;
-}
 
 const MockLessons: Lesson[] = [
   { code: "ONE_NORMAL", price: 730_000, name: "1종 보통(신규)" },
