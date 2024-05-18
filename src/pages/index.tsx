@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { TextBold } from "../components/TextBold";
+import { TextBold } from "@/components/TextBold";
 import { SelectLicenseBox } from "@/components/SelectLicenseBox";
 import { Lesson, LicenseGroup } from "@/model/selectLesson";
 import { useGoNext } from "@/hooks/use-go-next";
 import {
-  initialLicenseGroup,
-  initialLicenseSelected,
-  initialLicenseHave,
-} from "../constants";
+  INITIAL_LICENSE_GROUP,
+  INITIAL_LICENSE_SELECTED,
+  INITIAL_Final_Selected,
+} from "@/constants";
 import {
   addCommaToPrice,
   convertLicenseTypeEngToKr,
@@ -16,12 +16,15 @@ import {
 } from "@/utils";
 
 const SelectLesson = () => {
-  const [licenseGroup, setLicenseGroup] =
-    useState<LicenseGroup>(initialLicenseGroup);
-  const [licenseSelected, setLicenseSelected] = useState<(string | Lesson[])[]>(
-    initialLicenseSelected
+  const [licenseGroup, setLicenseGroup] = useState<LicenseGroup>(
+    INITIAL_LICENSE_GROUP
   );
-  const [licenseHave, setLicenseHave] = useState<Lesson>(initialLicenseHave);
+  const [licenseSelected, setLicenseSelected] = useState<(string | Lesson[])[]>(
+    INITIAL_LICENSE_SELECTED
+  );
+  const [finalSelected, setFinalSelected] = useState<Lesson>(
+    INITIAL_Final_Selected
+  );
 
   const goNext = useGoNext();
 
@@ -51,10 +54,9 @@ const SelectLesson = () => {
                     text={convertLicenseTypeEngToKr(key)}
                     onClick={() => {
                       setLicenseSelected([key, value]);
-                      setLicenseHave(
-                        value.length === 1 ? value[0] : initialLicenseHave
+                      setFinalSelected(
+                        value.length === 1 ? value[0] : INITIAL_Final_Selected
                       );
-                      console.log("selected", key, value);
                     }}
                     key={`licenseType${idx}`}
                   />
@@ -67,17 +69,15 @@ const SelectLesson = () => {
               <TextBold text="면허 보유 여부" size="20px" />
               <div className="flex flex-wrap gap-[10px]">
                 {Object.values(licenseSelected[1]).map((v, idx) => {
-                  // console.log(v);
-                  let isSelected = v.name === licenseHave.name;
+                  let isSelected = v.name === finalSelected.name;
                   return (
                     <SelectLicenseBox
                       isSelected={isSelected}
                       text={getLicenseNameStr(v.name)}
                       onClick={() => {
-                        setLicenseHave(v);
-                        console.log("licenseHave", v);
+                        setFinalSelected(v);
                       }}
-                      key={`licenseHave${idx}`}
+                      key={`finalSelected${idx}`}
                     />
                   );
                 })}
@@ -87,18 +87,18 @@ const SelectLesson = () => {
         </section>
         <section className="flex justify-between items-center px-[10px] shadow-[0_-5px_20px_0_rgba(0,0,0,0.3)]">
           <div className=" w-fit">
-            <div className="font-bold text-gray-500">{licenseHave.name}</div>
+            <div className="font-bold text-gray-500">{finalSelected.name}</div>
             <TextBold
-              text={`${addCommaToPrice(licenseHave.price)} 원`}
+              text={`${addCommaToPrice(finalSelected.price)} 원`}
               size="15px"
             />
           </div>
           <button
             className="bg-yellow-300 hover:bg-opacity-50 cursor-pointer w-[80px] h-[40px] disabled:bg-gray-400 disabled:text-gray-600"
-            disabled={!licenseHave.name.length || !licenseSelected.length}
+            disabled={!finalSelected.name.length || !licenseSelected.length}
             onClick={() => {
-              console.log("click next!", licenseHave);
-              goNext(licenseHave);
+              goNext(finalSelected);
+              console.log("final data: ", finalSelected);
             }}
           >
             <TextBold text="다음" size="15px" />

@@ -18,7 +18,6 @@ export const getLicenseGroup = (rawData: Lesson[]) => {
       licenseGroup["TWO_NORMAL"].push(v);
     }
   });
-  console.log("licenseGroup", licenseGroup);
   return licenseGroup;
 };
 
